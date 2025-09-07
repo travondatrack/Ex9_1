@@ -20,8 +20,8 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copy the WAR file from the build stage
 COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-# Copy the mp3 files directory
-COPY src/main/webapp/mp3 /usr/local/tomcat/webapps/ROOT/mp3/
+# Copy the mp3 files directory from the build stage
+COPY --from=build /app/src/main/webapp/mp3 /usr/local/tomcat/webapps/ROOT/mp3/
 
 # Set environment variables for Render
 ENV CATALINA_OPTS="-Xmx300m -Xms128m -server"
@@ -31,13 +31,16 @@ ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 ENV PORT=8080
 EXPOSE $PORT
 
-# Copy startup script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# Create startup script
+RUN echo '#!/bin/bash' > /start.sh && \
+    echo 'export PORT=${PORT:-8080}' >> /start.sh && \
+    echo 'sed -i "s/port=\"8080\"/port=\"${PORT}\"/g" /usr/local/tomcat/conf/server.xml' >> /start.sh && \
+    echo 'exec catalina.sh run' >> /start.sh && \
+    chmod +x /start.sh
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/ || exit 1
+# Health check (with increased start period)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/index.jsp || exit 1
 
 # Start Tomcat using our script
 CMD ["/start.sh"]

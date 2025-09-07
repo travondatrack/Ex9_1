@@ -52,3 +52,4 @@ The application will be available at http://localhost:8080
 
 - The application uses Java 8 and Tomcat 9
 - MP3 files are included as placeholders, replace with actual music files if needed
+- This configuration is specifically optimized for Java 8 compatibility on Render

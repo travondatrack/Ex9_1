@@ -8,8 +8,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Build the application
-RUN mvn clean package -DskipTests
+# Build the application - explicitly telling Maven not to use module flags
+RUN mvn clean package -DskipTests -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
 
 # Runtime stage
 FROM tomcat:9.0-jdk8-openjdk
@@ -24,19 +24,20 @@ COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 COPY src/main/webapp/mp3 /usr/local/tomcat/webapps/ROOT/mp3/
 
 # Set environment variables for Render
-ENV CATALINA_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED -Xmx300m -Xms128m -server"
+ENV CATALINA_OPTS="-Xmx300m -Xms128m -server"
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
 # Render uses dynamic PORT environment variable
 ENV PORT=8080
 EXPOSE $PORT
 
-# Configure Tomcat to use the PORT variable
-RUN sed -i 's/port="8080"/port="${PORT}"/g' /usr/local/tomcat/conf/server.xml
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:${PORT}/ || exit 1
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+# Start Tomcat using our script
+CMD ["/start.sh"]

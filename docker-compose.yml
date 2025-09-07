@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    volumes:
+      - ./src/main/webapp/mp3:/usr/local/tomcat/webapps/ROOT/mp3

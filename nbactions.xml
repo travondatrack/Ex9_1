@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>run</actionName>
+        <packagings>
+            <packaging>war</packaging>
+        </packagings>
+        <goals>
+            <goal>package</goal>
+        </goals>
+        <properties>
+            <netbeans.deploy>true</netbeans.deploy>
+            <netbeans.deploy.clientUrlPart>/index.jsp</netbeans.deploy.clientUrlPart>
+        </properties>
+    </action>
+    <action>
+        <actionName>debug</actionName>
+        <packagings>
+            <packaging>war</packaging>
+        </packagings>
+        <goals>
+            <goal>package</goal>
+        </goals>
+        <properties>
+            <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
+            <netbeans.deploy>true</netbeans.deploy>
+            <netbeans.deploy.clientUrlPart>/index.jsp</netbeans.deploy.clientUrlPart>
+            <jpda.listen>maven</jpda.listen>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-Clean and Build with JVM args</actionName>
+        <displayName>Clean and Build with JVM args</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>install</goal>
+        </goals>
+        <properties>
+            <Env.MAVEN_OPTS>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</Env.MAVEN_OPTS>
+        </properties>
+    </action>
+</actions>

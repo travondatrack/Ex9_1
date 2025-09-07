@@ -2,9 +2,11 @@ services:
   - type: web
     name: jstl-download-app
     env: docker
+    region: singapore
     dockerfilePath: ./Dockerfile
     plan: free
-    healthCheckPath: /
+    # Process-based health check instead of HTTP
+    healthCheckCommand: ps -ef | grep -v grep | grep catalina.startup.Bootstrap
     envVars:
       - key: PORT
         value: 8080
